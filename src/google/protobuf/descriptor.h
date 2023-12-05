@@ -1036,16 +1036,9 @@ class PROTOBUF_EXPORT FieldDescriptor : private internal::SymbolBase,
   friend class Reflection;
   friend class FieldDescriptorLegacy;
 
-
- public:
-  ABSL_DEPRECATED(
-      "Syntax is deprecated in favor of editions, please use "
-      "FieldDescriptor::has_presence instead.")
   // Returns true if this field was syntactically written with "optional" in the
   // .proto file. Excludes singular proto3 fields that do not have a label.
   bool has_optional_keyword() const;
-
- private:
 
   // Get the merged features that apply to this field.  These are specified in
   // the .proto file through the feature options in the message definition.
@@ -1219,16 +1212,9 @@ class PROTOBUF_EXPORT OneofDescriptor : private internal::SymbolBase {
   friend class compiler::cpp::Formatter;
   friend class OneofDescriptorLegacy;
 
-
- public:
-  ABSL_DEPRECATED(
-      "Syntax is deprecated in favor of editions, please use "
-      "real_oneof_decl_count for now instead of is_synthetic.")
   // Returns whether this oneof was inserted by the compiler to wrap a proto3
   // optional field. If this returns true, code generators should *not* emit it.
   bool is_synthetic() const;
-
- private:
 
   // Get the merged features that apply to this oneof.  These are specified in
   // the .proto file through the feature options in the oneof definition.
@@ -1869,18 +1855,12 @@ class PROTOBUF_EXPORT FileDescriptor : private internal::SymbolBase {
   // descriptor.proto, and any available extensions of that message.
   const FileOptions& options() const;
 
-
  private:
   // With the upcoming release of editions, syntax should not be used for
   // business logic.  Instead, the various feature helpers defined in this file
   // should be used to query more targeted behaviors.  For example:
   // has_presence, is_closed, requires_utf8_validation.
-  enum
-      ABSL_DEPRECATED(
-          "Syntax is deprecated in favor of editions.  Please use targeted "
-          "feature helpers instead (e.g. has_presence, is_packed, "
-          "requires_utf8_validation, etc).")
-          Syntax
+  enum Syntax
 #ifndef SWIG
       : int
 #endif  // !SWIG
@@ -1891,10 +1871,6 @@ class PROTOBUF_EXPORT FileDescriptor : private internal::SymbolBase {
     SYNTAX_EDITIONS = 99,
   };
   PROTOBUF_IGNORE_DEPRECATION_START
-  ABSL_DEPRECATED(
-      "Syntax is deprecated in favor of editions.  Please use targeted "
-      "feature helpers instead (e.g. has_presence, is_packed, "
-      "requires_utf8_validation, etc).")
   Syntax syntax() const;
   PROTOBUF_IGNORE_DEPRECATION_STOP
 
@@ -1903,7 +1879,6 @@ class PROTOBUF_EXPORT FileDescriptor : private internal::SymbolBase {
   friend class FileDescriptorLegacy;
 
   PROTOBUF_IGNORE_DEPRECATION_START
-  ABSL_DEPRECATED("Syntax is deprecated in favor of editions")
   static const char* SyntaxName(Syntax syntax);
   PROTOBUF_IGNORE_DEPRECATION_STOP
 
@@ -2211,12 +2186,7 @@ class PROTOBUF_EXPORT DescriptorPool {
     virtual void RecordError(absl::string_view filename,
                              absl::string_view element_name,
                              const Message* descriptor, ErrorLocation location,
-                             absl::string_view message) {
-      PROTOBUF_IGNORE_DEPRECATION_START
-      AddError(std::string(filename), std::string(element_name), descriptor,
-               location, std::string(message));
-      PROTOBUF_IGNORE_DEPRECATION_STOP
-    }
+                             absl::string_view message) = 0;
 
     // Reports a warning in the FileDescriptorProto. Use this function if the
     // problem occurred should NOT interrupt building the FileDescriptorProto.
@@ -2230,28 +2200,7 @@ class PROTOBUF_EXPORT DescriptorPool {
                                absl::string_view element_name,
                                const Message* descriptor,
                                ErrorLocation location,
-                               absl::string_view message) {
-      PROTOBUF_IGNORE_DEPRECATION_START
-      AddWarning(std::string(filename), std::string(element_name), descriptor,
-                 location, std::string(message));
-      PROTOBUF_IGNORE_DEPRECATION_STOP
-    }
-
-   private:
-    // These should never be called directly, but if a legacy class overrides
-    // them they'll get routed to by the Record* methods.
-    ABSL_DEPRECATED("Use RecordError")
-    virtual void AddError(const std::string& filename,
-                          const std::string& element_name,
-                          const Message* descriptor, ErrorLocation location,
-                          const std::string& message) {
-      ABSL_LOG(FATAL) << "AddError or RecordError must be implemented.";
-    }
-    ABSL_DEPRECATED("Use RecordWarning")
-    virtual void AddWarning(const std::string& filename,
-                            const std::string& element_name,
-                            const Message* descriptor, ErrorLocation location,
-                            const std::string& message) {}
+                               absl::string_view message) = 0;
   };
 
   // Convert the FileDescriptorProto to real descriptors and place them in
