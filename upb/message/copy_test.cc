@@ -301,7 +301,7 @@ TEST(GeneratedCode, DeepCloneMessageWithUnknowns) {
   ASSERT_EQ(status, kUpb_EncodeStatus_Ok);
   std::string unknown_data(data, len);
   // Add unknown data.
-  _upb_Message_AddUnknown(msg, data, len, source_arena);
+  upb_Message_AddUnknown(msg, data, len, source_arena);
   // Create clone.
   upb_Arena* clone_arena = upb_Arena_New();
   protobuf_test_messages_proto2_TestAllTypesProto2* clone =
